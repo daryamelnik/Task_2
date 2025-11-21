@@ -21,7 +21,6 @@ class TestUserCreation:
         access_token = response.json().get("accessToken")
         assert access_token is not None, "Access token was not found in the response"
 
-        # Cleanup
         headers = {"Authorization": access_token}
         delete_response = requests.delete(f'{Urls.MAIN_URL}/api/auth/user', headers=headers)
         assert delete_response.status_code == 202, "User cleanup failed"
@@ -30,7 +29,6 @@ class TestUserCreation:
     @allure.description("Test case for creating a user that already exists.")
     def test_create_duplicate_user_error(self, register_user):
         user_payload, _ = register_user
-        # The fixture already created the user, so we try to create it again
         response = requests.post(f'{Urls.MAIN_URL}/api/auth/register', data=user_payload)
         
         assert response.status_code == 403

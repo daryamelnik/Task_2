@@ -3,6 +3,10 @@ import requests
 import allure
 from tests.urls import Urls
 
+# Error messages
+INGREDIENTS_REQUIRED_ERROR = "Ingredient ids must be provided"
+AUTHORIZATION_REQUIRED_ERROR = "You should be authorised"
+
 
 @allure.epic("Order Management")
 @allure.feature("Create Order")
@@ -34,8 +38,6 @@ class TestCreateOrder:
         
         response = requests.post(f'{Urls.MAIN_URL}/api/orders', json=payload)
         
-        # The API actually returns 200 OK and creates an order for an anonymous user.
-        # The test should reflect the actual behavior.
         assert response.status_code == 200
         assert response.json()["success"] is True
         assert "order" in response.json()
@@ -52,7 +54,7 @@ class TestCreateOrder:
         
         assert response.status_code == 400
         assert response.json()["success"] is False
-        assert response.json()["message"] == "Ingredient ids must be provided"
+        assert response.json()["message"] == INGREDIENTS_REQUIRED_ERROR
 
     @allure.title("Create an order with an invalid ingredient hash")
     @allure.description("Test case for creating an order with an invalid ingredient hash.")
@@ -75,13 +77,11 @@ class TestGetUserOrders:
     def test_get_user_orders_with_auth_success(self, register_user, get_ingredient_hashes):
         _, access_token = register_user
         
-        # Create an order first
         payload = {"ingredients": [get_ingredient_hashes[0]]}
         headers = {"Authorization": access_token}
         create_response = requests.post(f'{Urls.MAIN_URL}/api/orders', headers=headers, json=payload)
         assert create_response.status_code == 200, "Failed to create an order for the test"
 
-        # Now, get the orders
         response = requests.get(f'{Urls.MAIN_URL}/api/orders', headers=headers)
         
         assert response.status_code == 200
@@ -97,4 +97,4 @@ class TestGetUserOrders:
         
         assert response.status_code == 401
         assert response.json()["success"] is False
-        assert response.json()["message"] == "You should be authorised"
+        assert response.json()["message"] == AUTHORIZATION_REQUIRED_ERROR
