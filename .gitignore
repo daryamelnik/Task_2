@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# macOS
+.DS_Store
+
 # C extensions
 *.so
 
@@ -127,5 +130,4 @@ cython_debug/
 .vscode/
 
 # Allure reports
-allure-results/
 allure-report/
